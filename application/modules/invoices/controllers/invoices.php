@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 /*
  * InvoicePlane
- * 
+ *
  * A free and open source web based invoicing system
  *
  * @package		InvoicePlane
@@ -13,7 +13,7 @@ if (!defined('BASEPATH'))
  * @copyright	Copyright (c) 2012 - 2015 InvoicePlane.com
  * @license		https://invoiceplane.com/license.txt
  * @link		https://invoiceplane.com
- * 
+ *
  */
 
 class Invoices extends Admin_Controller
@@ -206,7 +206,14 @@ class Invoices extends Admin_Controller
             $this->mdl_invoices->mark_sent($invoice_id);
         }
 
-        generate_invoice_pdf($invoice_id, $stream, $invoice_template);
+        $include_zugferd_xml = $this->input->get('include_zugferd_xml') == 'true';
+        generate_invoice_pdf($invoice_id, $stream, $invoice_template, NULL, $include_zugferd_xml);
+    }
+
+    public function generate_zugferd_xml($invoice_id)
+    {
+        $this->load->helper('zugferd');
+        generate_invoice_zugferd_xml($invoice_id);
     }
 
     public function delete_invoice_tax($invoice_id, $invoice_tax_rate_id)

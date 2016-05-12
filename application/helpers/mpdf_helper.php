@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 /*
  * InvoicePlane
- * 
+ *
  * A free and open source web based invoicing system
  *
  * @package		InvoicePlane
@@ -13,17 +13,31 @@ if (!defined('BASEPATH'))
  * @copyright	Copyright (c) 2012 - 2015 InvoicePlane.com
  * @license		https://invoiceplane.com/license.txt
  * @link		https://invoiceplane.com
- * 
+ *
  */
 
-function pdf_create($html, $filename, $stream = TRUE, $password = NULL,$isInvoice = NULL,$isGuest = NULL)
+function pdf_create($html, $filename, $stream = TRUE, $password = NULL,$isInvoice = NULL,$isGuest = NULL, $zugferd_invoice = FALSE, $associatedFiles = NULL)
 {
     require_once(APPPATH . 'helpers/mpdf/mpdf.php');
 
     $mpdf = new mPDF();
     $mpdf->useAdobeCJK = true;
 	$mpdf->SetAutoFont();
-    $mpdf->SetProtection(array('copy','print'), $password, $password);
+
+
+    if ($zugferd_invoice) {
+        $CI = &get_instance();
+        $CI->load->helper('zugferd');
+        $mpdf->PDFA = true;
+        $mpdf->PDFAauto = true;
+        $mpdf->SetAdditionalRdf(ZugferdRdf());
+        if ($associatedFiles) {
+            $mpdf->SetAssociatedFiles($associatedFiles);
+        }
+    } else {
+        $mpdf->SetProtection(array('copy','print'), $password, $password);
+    }
+
     if(!(is_dir('./uploads/archive/') OR is_link('./uploads/archive/') ))
         mkdir ('./uploads/archive/','0777');
 
